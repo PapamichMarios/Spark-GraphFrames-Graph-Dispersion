@@ -11,7 +11,7 @@ from graphframes.lib import AggregateMessages as AM
 from pyspark import SparkConf, SparkContext
 from pyspark.sql import SQLContext, functions as sqlfunctions, types
 from pyspark.sql import functions as F
-from pyspark.sql.functions import explode
+from pyspark.sql.functions import explode, explode_outer
 from itertools import combinations
 import sys
 
@@ -85,20 +85,25 @@ neighbour_list_type = types.ArrayType(types.StringType())
 common_neighbours_udf = F.udf(common_neighbours, neighbour_list_type)
 
 common = aggregates.withColumn("common_neighbours", common_neighbours_udf(aggregates["node_neighbours"], aggregates["messagers_neighbours"])).drop("messagers_neighbours").drop("node_neighbours")
-common.show()
+common.show(maxPrintSize)
 
 # dispersion
 print("Calculating dispersion...")
-dispersion = common.select(common["id"].alias("node"), common["neighbour"], explode(common["common_neighbours"]).alias("id"))
-# dispersion.show(maxPrintSize, truncate=False)
+dispersion = common.select(common["id"].alias("node"), common["neighbour"], explode_outer(common["common_neighbours"]).alias("id")).na.fill("NO_COMMON_NEIGHBOURS")
+# dispersion.show(maxPrintSize)
 
-dispersion = dispersion.join(graph.vertices, on="id").drop("neighbours").withColumnRenamed("id", "common_neighbours").withColumnRenamed("neighbours_list", "neighbours_of_common_neighbours")
-# dispersion.show(maxPrintSize, truncate=False)
+dispersion = dispersion.join(graph.vertices, on="id", how="left_outer").drop("neighbours").withColumnRenamed("id", "common_neighbours").withColumnRenamed("neighbours_list", "neighbours_of_common_neighbours")
+# dispersion.show(maxPrintSize)
 
 dispersion = dispersion.groupBy("node", "neighbour").agg(F.collect_list("common_neighbours").alias("common_neighbours"), F.collect_list("neighbours_of_common_neighbours").alias("neighbours_of_common_neighbours"))
-# dispersion.show(maxPrintSize, truncate=False)
+# dispersion.show(maxPrintSize)
 
 def calculate_dispersion(node, neighbour, common_neighbours, neighbours_of_common_neighbours):
+
+    # if they dont have any common neighbours their dispersion equals 0
+    if not neighbours_of_common_neighbours:
+        return 0
+
     hashmap = {}
     for i in range(0, len(common_neighbours)):
         hashmap[common_neighbours[i]] = neighbours_of_common_neighbours[i]
@@ -131,7 +136,7 @@ calculate_dispersion_type = types.IntegerType()
 calculate_dispersion_udf = F.udf(calculate_dispersion, calculate_dispersion_type)
 
 dispersion = dispersion.withColumn("dispersion", calculate_dispersion_udf(dispersion["node"], dispersion["neighbour"], dispersion["common_neighbours"], dispersion["neighbours_of_common_neighbours"])).drop("common_neighbours").drop("neighbours_of_common_neighbours")
-# dispersion.show()
+dispersion.show()
 
 # final graph with dispersion on edges
 print("Final Graph:")

@@ -1,6 +1,7 @@
 +-----------+-----------+----------+
 |        src|        dst|dispersion|
 +-----------+-----------+----------+
+|        HAN|      JABBA|         0|
 |      R2-D2|  CHEWBACCA|         0|
 |       LUKE|       BERU|         0|
 | RED LEADER|       LUKE|         5|
@@ -56,10 +57,12 @@
 |    RED TEN|       LUKE|         0|
 |      C-3PO|  CHEWBACCA|         0|
 |      MOTTI|       LEIA|         0|
+|        HAN|     GREEDO|         0|
 |    DODONNA|  CHEWBACCA|         0|
 |      CAMIE|      BIGGS|         0|
 |    OBI-WAN|  CHEWBACCA|         0|
 |  CHEWBACCA|    OBI-WAN|         0|
+|     GREEDO|        HAN|         0|
 | RED LEADER|      BIGGS|         0|
 |DARTH VADER|      MOTTI|         0|
 |       LUKE|      CAMIE|         0|
@@ -85,6 +88,7 @@
 |       LEIA|      BIGGS|         0|
 |     TARKIN|      MOTTI|         0|
 |  CHEWBACCA|      R2-D2|         0|
+|      JABBA|        HAN|         0|
 |      BIGGS|       LUKE|         5|
 |    DODONNA|      WEDGE|         0|
 |        HAN|    OBI-WAN|         0|
@@ -118,4 +122,3 @@
 |DARTH VADER|       LEIA|         4|
 |DARTH VADER|    OBI-WAN|         0|
 +-----------+-----------+----------+
-
