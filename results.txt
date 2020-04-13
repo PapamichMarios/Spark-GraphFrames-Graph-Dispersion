@@ -1,124 +1,24 @@
-+-----------+-----------+----------+
-|        src|        dst|dispersion|
-+-----------+-----------+----------+
-|        HAN|      JABBA|         0|
-|      R2-D2|  CHEWBACCA|         0|
-|       LUKE|       BERU|         0|
-| RED LEADER|       LUKE|         5|
-|       LUKE|      WEDGE|         0|
-|      R2-D2|       LUKE|         0|
-|       LEIA|      MOTTI|         0|
-|       LEIA|       LUKE|         0|
-|       BERU|       OWEN|         0|
-|      BIGGS|GOLD LEADER|         0|
-|    DODONNA|      R2-D2|         0|
-|        HAN|      R2-D2|         0|
-|    OBI-WAN|       LUKE|         0|
-|    OBI-WAN|       LEIA|         0|
-|GOLD LEADER| RED LEADER|         0|
-|       LUKE|  CHEWBACCA|         0|
-|      MOTTI|DARTH VADER|         0|
-|DARTH VADER|     TARKIN|         0|
-|  CHEWBACCA|      C-3PO|         0|
-|       LEIA|     TARKIN|         0|
-|      WEDGE|       LUKE|         0|
-|       LEIA|      C-3PO|         0|
-|        HAN|      C-3PO|         0|
-|       BERU|      C-3PO|         0|
-|       LUKE|      R2-D2|         0|
-|      BIGGS|      C-3PO|         0|
-|       LUKE|        HAN|         0|
-|      BIGGS|       LEIA|         0|
-|      R2-D2|      C-3PO|         0|
-|    DODONNA|       LUKE|         4|
-|       LUKE|    RED TEN|         0|
-|  CHEWBACCA|DARTH VADER|         0|
-|      MOTTI|     TARKIN|         0|
-| RED LEADER|       LEIA|         0|
-|GOLD LEADER|       LUKE|         0|
-|GOLD LEADER|      WEDGE|         0|
-|       LEIA|DARTH VADER|         4|
-|  CHEWBACCA|       LEIA|         0|
-|DARTH VADER|  CHEWBACCA|         0|
-|       LUKE|    DODONNA|         4|
-|      R2-D2|        HAN|         0|
-|      R2-D2|       LEIA|         0|
-|      C-3PO|       LEIA|         0|
-|      C-3PO|      R2-D2|         0|
-|      C-3PO|       BERU|         0|
-|     TARKIN|DARTH VADER|         0|
-|       LEIA|  CHEWBACCA|         0|
-|       LUKE|       OWEN|         0|
-|     TARKIN|       LEIA|         0|
-|    OBI-WAN|        HAN|         0|
-|      R2-D2|    OBI-WAN|         0|
-|      WEDGE| RED LEADER|         0|
-|      C-3PO| RED LEADER|         0|
-|    RED TEN|       LUKE|         0|
-|      C-3PO|  CHEWBACCA|         0|
-|      MOTTI|       LEIA|         0|
-|        HAN|     GREEDO|         0|
-|    DODONNA|  CHEWBACCA|         0|
-|      CAMIE|      BIGGS|         0|
-|    OBI-WAN|  CHEWBACCA|         0|
-|  CHEWBACCA|    OBI-WAN|         0|
-|     GREEDO|        HAN|         0|
-| RED LEADER|      BIGGS|         0|
-|DARTH VADER|      MOTTI|         0|
-|       LUKE|      CAMIE|         0|
-|  CHEWBACCA|    DODONNA|         0|
-|  CHEWBACCA|        HAN|         0|
-|GOLD LEADER|      BIGGS|         0|
-|       BERU|       LEIA|         0|
-|       LUKE|       LEIA|         0|
-|      CAMIE|       LUKE|         0|
-|      WEDGE|      BIGGS|         0|
-|GOLD LEADER|    DODONNA|         0|
-|      WEDGE|    DODONNA|         0|
-|       LEIA|    OBI-WAN|         0|
-| RED LEADER|    RED TEN|         0|
-| RED LEADER|GOLD LEADER|         0|
-|       OWEN|      C-3PO|         0|
-|       OWEN|       LUKE|         0|
-|    OBI-WAN|DARTH VADER|         0|
-|      BIGGS|      CAMIE|         0|
-|    RED TEN| RED LEADER|         0|
-|       LUKE|GOLD LEADER|         0|
-|      C-3PO|    OBI-WAN|         0|
-|       LEIA|      BIGGS|         0|
-|     TARKIN|      MOTTI|         0|
-|  CHEWBACCA|      R2-D2|         0|
-|      JABBA|        HAN|         0|
-|      BIGGS|       LUKE|         5|
-|    DODONNA|      WEDGE|         0|
-|        HAN|    OBI-WAN|         0|
-|       LEIA|      R2-D2|         0|
-|      C-3PO|       OWEN|         0|
-|        HAN|       LEIA|         0|
-|       OWEN|       BERU|         0|
-|       BERU|       LUKE|         0|
-|       LUKE|    OBI-WAN|         0|
-| RED LEADER|      WEDGE|         0|
-|      C-3PO|        HAN|         0|
-|      WEDGE|GOLD LEADER|         0|
-|        HAN|  CHEWBACCA|         0|
-|      C-3PO|      BIGGS|         0|
-|       LEIA|       BERU|         0|
-|    OBI-WAN|      R2-D2|         0|
-|        HAN|       LUKE|         0|
-|       LUKE|      C-3PO|         6|
-|    OBI-WAN|      C-3PO|         0|
-|      R2-D2|    DODONNA|         0|
-|      C-3PO|       LUKE|         6|
-|       LEIA| RED LEADER|         0|
-|       LUKE|      BIGGS|         5|
-|       LEIA|        HAN|         0|
-|       LUKE| RED LEADER|         5|
-|      BIGGS| RED LEADER|         0|
-|      BIGGS|      WEDGE|         0|
-|    DODONNA|GOLD LEADER|         0|
-|  CHEWBACCA|       LUKE|         0|
-| RED LEADER|      C-3PO|         0|
-|DARTH VADER|       LEIA|         4|
-|DARTH VADER|    OBI-WAN|         0|
-+-----------+-----------+----------+
++-----------+----------------+
+|         id|      dispersion|
++-----------+----------------+
+|      C-3PO|       [LUKE, 6]|
+|      WEDGE|    [DODONNA, 0]|
+|       BERU|       [LEIA, 0]|
+|      CAMIE|       [LUKE, 0]|
+|        HAN|      [JABBA, 0]|
+|DARTH VADER|       [LEIA, 4]|
+|       LUKE|      [C-3PO, 6]|
+|       LEIA|[DARTH VADER, 4]|
+|    OBI-WAN|        [HAN, 0]|
+| RED LEADER|       [LUKE, 5]|
+|     TARKIN|       [LEIA, 0]|
+|  CHEWBACCA|    [DODONNA, 0]|
+|      MOTTI|       [LEIA, 0]|
+|GOLD LEADER|    [DODONNA, 0]|
+|      BIGGS|       [LUKE, 5]|
+|     GREEDO|        [HAN, 0]|
+|      JABBA|        [HAN, 0]|
+|    DODONNA|       [LUKE, 4]|
+|    RED TEN| [RED LEADER, 0]|
+|      R2-D2|    [DODONNA, 0]|
++-----------+----------------+

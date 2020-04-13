@@ -17,6 +17,12 @@ import sys
 
 maxPrintSize = 500
 
+
+def intersection(lst1, lst2):
+    lst3 = [value for value in lst1 if value in lst2]
+    return lst3
+
+
 # set up a spark session
 spark = SparkSession.builder.appName('graph-dispersion').getOrCreate()
 
@@ -36,10 +42,14 @@ edges = edges.union(reverse_edges)
 vertices = edges.groupBy("src").agg(F.collect_list("dst").alias("neighbours_list"))
 vertices = vertices.withColumnRenamed("src", "id")
 
+
 # add neighbours column having [node_id, neighbours_list]
 def new_neighbours(id, neighbours):
     return {"id": id, "neighbours": neighbours}
-neighbours_type = types.StructType([types.StructField("id", types.StringType()), types.StructField("neighbours", types.ArrayType(types.StringType()))])
+
+
+neighbours_type = types.StructType(
+    [types.StructField("id", types.StringType()), types.StructField("neighbours", types.ArrayType(types.StringType()))])
 new_neighbours_udf = F.udf(new_neighbours, neighbours_type)
 
 vertices = vertices.withColumn("neighbours", new_neighbours_udf(vertices["id"], vertices["neighbours_list"]))
@@ -58,90 +68,69 @@ aggregates.show()
 # find common neighbours
 print("Finding common neighbours:")
 aggregates = aggregates.join(graph.vertices, on="id").drop("neighbours")
-aggregates = aggregates.select(aggregates["id"], aggregates["neighbours_list"].alias("node_neighbours"), explode(aggregates["agg"]).alias("neighbours"))
-# aggregates.show(maxPrintSize, truncate=False)
 
-def neighbour_id(neighbours):
-    return neighbours.id
-neighbour_id_type = types.StringType()
-neighbour_id_udf = F.udf(neighbour_id, neighbour_id_type)
 
-def neighbour_list(neighbours):
-    return neighbours.neighbours
-neighbour_list_type = types.ArrayType(types.StringType())
-neighbour_list_udf = F.udf(neighbour_list, neighbour_list_type)
-
-aggregates = aggregates.withColumn("neighbour", neighbour_id_udf(aggregates["neighbours"])).withColumn("messagers_neighbours", neighbour_list_udf(aggregates["neighbours"])).drop("neighbours")
-# aggregates.show(maxPrintSize, truncate=False)
+# aggregates.show()
 
 def common_neighbours(node_neighbours, messagers_neighbours):
-    common_neighbours_list = []
-    for neighbour in messagers_neighbours:
-        if neighbour in node_neighbours:
-            common_neighbours_list.append(neighbour)
+    common_list = []
+    for neighbours in messagers_neighbours:
+        common_list.append({"id": neighbours.id, "neighbours": intersection(neighbours.neighbours, node_neighbours)})
 
-    return common_neighbours_list
-neighbour_list_type = types.ArrayType(types.StringType())
+    return common_list
+
+
+neighbour_list_type = types.ArrayType(neighbours_type)
 common_neighbours_udf = F.udf(common_neighbours, neighbour_list_type)
 
-common = aggregates.withColumn("common_neighbours", common_neighbours_udf(aggregates["node_neighbours"], aggregates["messagers_neighbours"])).drop("messagers_neighbours").drop("node_neighbours")
-common.show(maxPrintSize)
+common = aggregates.withColumn("common_neighbours",
+                               common_neighbours_udf(aggregates["neighbours_list"], aggregates["agg"])).drop("agg").drop("neighbours_list")
+common.show()
 
 # dispersion
-print("Calculating dispersion...")
-dispersion = common.select(common["id"].alias("node"), common["neighbour"], explode_outer(common["common_neighbours"]).alias("id")).na.fill("NO_COMMON_NEIGHBOURS")
-# dispersion.show(maxPrintSize)
+print("Dispersion")
 
-dispersion = dispersion.join(graph.vertices, on="id", how="left_outer").drop("neighbours").withColumnRenamed("id", "common_neighbours").withColumnRenamed("neighbours_list", "neighbours_of_common_neighbours")
-# dispersion.show(maxPrintSize)
 
-dispersion = dispersion.groupBy("node", "neighbour").agg(F.collect_list("common_neighbours").alias("common_neighbours"), F.collect_list("neighbours_of_common_neighbours").alias("neighbours_of_common_neighbours"))
-# dispersion.show(maxPrintSize)
-
-def calculate_dispersion(node, neighbour, common_neighbours, neighbours_of_common_neighbours):
-
-    # if they dont have any common neighbours their dispersion equals 0
-    if not neighbours_of_common_neighbours:
-        return 0
-
+def calculate_dispersion(node, common_neighbours):
     hashmap = {}
-    for i in range(0, len(common_neighbours)):
-        hashmap[common_neighbours[i]] = neighbours_of_common_neighbours[i]
+    for neighbours in common_neighbours:
+        hashmap[neighbours['id']] = neighbours['neighbours']
 
-    dispersion = 0 
-    for x,y in combinations(common_neighbours, 2):
+    dispersion_list = []
+    for common_neighbour in common_neighbours:
 
-        # they are connected with an edge
-        if x in hashmap[y]:
-            continue
+        dispersion = 0
+        for s,t in combinations(common_neighbour['neighbours'], 2):
 
-        # they share neighbours othen than u and v
-        def intersection(lst1, lst2): 
-            lst3 = [value for value in lst1 if value in lst2] 
-            return lst3 
+            # if they are connected with an edge
+            if s in hashmap[t]: continue
 
-        common = intersection(hashmap[x], hashmap[y])
-        if node in common:
-            common.remove(node)
+            # they share neighbours other than u and v
+            common = intersection(hashmap[s], hashmap[t])
+            if node in common: common.remove(node)
+            if common_neighbour['id'] in common: common.remove(common_neighbour['id'])
+            if len(common) > 0: continue
 
-        if neighbour in common:
-            common.remove(neighbour)
+            dispersion += 1
 
-        if len(common) > 0:
-            continue
+        dispersion_list.append({
+            "id": common_neighbour['id'],
+            "dispersion": dispersion
+        })
 
-        dispersion += 1
-    return dispersion
-calculate_dispersion_type = types.IntegerType()
+    maximum = max(dispersion_list, key=lambda x:x['dispersion'])
+    return maximum
+
+calculate_dispersion_type = types.StructType([types.StructField("id", types.StringType()), types.StructField("dispersion", types.IntegerType())])
 calculate_dispersion_udf = F.udf(calculate_dispersion, calculate_dispersion_type)
 
-dispersion = dispersion.withColumn("dispersion", calculate_dispersion_udf(dispersion["node"], dispersion["neighbour"], dispersion["common_neighbours"], dispersion["neighbours_of_common_neighbours"])).drop("common_neighbours").drop("neighbours_of_common_neighbours")
+dispersion = common.withColumn("dispersion", calculate_dispersion_udf(common["id"], common["common_neighbours"])).drop("common_neighbours")
 dispersion.show()
 
 # final graph with dispersion on edges
 print("Final Graph:")
-dispersion = dispersion.withColumnRenamed("node", "src").withColumnRenamed("neighbour", "dst")
-cached_edges = AM.getCachedDataFrame(dispersion)
-graph = GraphFrame(graph.vertices, cached_edges)
-graph.vertices.show(maxPrintSize)
-graph.edges.show(maxPrintSize)
+dispersion = dispersion.withColumnRenamed("node", "src")
+cached_vertices = AM.getCachedDataFrame(dispersion)
+graph = GraphFrame(cached_vertices, graph.edges)
+graph.vertices.show()
+graph.edges.show()
