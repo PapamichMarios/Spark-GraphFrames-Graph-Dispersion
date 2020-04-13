@@ -39,13 +39,16 @@ reverse_edges = edges.selectExpr("dst as src", "src as dst")
 edges = edges.union(reverse_edges)
 
 # add neighbours_list column having all the neighbours ids
-vertices = edges.groupBy("src").agg(F.collect_list("dst").alias("neighbours_list"))
+vertices = edges.groupBy("src").agg(F.collect_set("dst").alias("neighbours_list"))
 vertices = vertices.withColumnRenamed("src", "id")
 
 
 # add neighbours column having [node_id, neighbours_list]
 def new_neighbours(id, neighbours):
-    return {"id": id, "neighbours": neighbours}
+    return {
+        "id": id, 
+        "neighbours": neighbours
+    }
 
 
 neighbours_type = types.StructType(
@@ -68,8 +71,6 @@ aggregates.show()
 # find common neighbours
 print("Finding common neighbours:")
 aggregates = aggregates.join(graph.vertices, on="id").drop("neighbours")
-
-
 # aggregates.show()
 
 def common_neighbours(node_neighbours, messagers_neighbours):
@@ -91,7 +92,7 @@ common.show()
 print("Dispersion")
 
 
-def calculate_dispersion(node, common_neighbours):
+def calculate_dispersion(common_neighbours):
     hashmap = {}
     for neighbours in common_neighbours:
         hashmap[neighbours['id']] = neighbours['neighbours']
@@ -107,7 +108,6 @@ def calculate_dispersion(node, common_neighbours):
 
             # they share neighbours other than u and v
             common = intersection(hashmap[s], hashmap[t])
-            if node in common: common.remove(node)
             if common_neighbour['id'] in common: common.remove(common_neighbour['id'])
             if len(common) > 0: continue
 
@@ -124,7 +124,7 @@ def calculate_dispersion(node, common_neighbours):
 calculate_dispersion_type = types.StructType([types.StructField("id", types.StringType()), types.StructField("dispersion", types.IntegerType())])
 calculate_dispersion_udf = F.udf(calculate_dispersion, calculate_dispersion_type)
 
-dispersion = common.withColumn("dispersion", calculate_dispersion_udf(common["id"], common["common_neighbours"])).drop("common_neighbours")
+dispersion = common.withColumn("dispersion", calculate_dispersion_udf(common["common_neighbours"])).drop("common_neighbours")
 dispersion.show()
 
 # final graph with dispersion on edges
@@ -132,5 +132,5 @@ print("Final Graph:")
 dispersion = dispersion.withColumnRenamed("node", "src")
 cached_vertices = AM.getCachedDataFrame(dispersion)
 graph = GraphFrame(cached_vertices, graph.edges)
-graph.vertices.show()
+graph.vertices.show(maxPrintSize)
 graph.edges.show()

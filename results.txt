@@ -2,23 +2,24 @@
 |         id|      dispersion|
 +-----------+----------------+
 |      C-3PO|       [LUKE, 6]|
-|      WEDGE|    [DODONNA, 0]|
-|       BERU|       [LEIA, 0]|
-|      CAMIE|       [LUKE, 0]|
+|      WEDGE| [RED LEADER, 0]|
+|       BERU|       [LUKE, 0]|
+|      CAMIE|      [BIGGS, 0]|
 |        HAN|      [JABBA, 0]|
 |DARTH VADER|       [LEIA, 4]|
 |       LUKE|      [C-3PO, 6]|
 |       LEIA|[DARTH VADER, 4]|
 |    OBI-WAN|        [HAN, 0]|
 | RED LEADER|       [LUKE, 5]|
-|     TARKIN|       [LEIA, 0]|
-|  CHEWBACCA|    [DODONNA, 0]|
-|      MOTTI|       [LEIA, 0]|
-|GOLD LEADER|    [DODONNA, 0]|
+|     TARKIN|      [MOTTI, 0]|
+|  CHEWBACCA|        [HAN, 0]|
+|      MOTTI|     [TARKIN, 0]|
+|GOLD LEADER| [RED LEADER, 0]|
 |      BIGGS|       [LUKE, 5]|
 |     GREEDO|        [HAN, 0]|
 |      JABBA|        [HAN, 0]|
 |    DODONNA|       [LUKE, 4]|
 |    RED TEN| [RED LEADER, 0]|
-|      R2-D2|    [DODONNA, 0]|
+|      R2-D2|        [HAN, 0]|
+|       OWEN|       [BERU, 0]|
 +-----------+----------------+
